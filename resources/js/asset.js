@@ -1,53 +1,67 @@
-    // Nova Asset JS
+// Nova Asset JS
 
-    function parseRouteForDisplay(route) {
-        return route.replace("\/", "").split("/").map(_.startCase).join(" > ")
-    }
+function parseRouteForDisplay(route) {
+    return route.replace("\/", "").split("/").map(_.startCase).join(" > ")
+}
 
-    function getResourceMeta(resourceName) {
-        var resourceMeta = Nova.config.resources.filter(function(resource) {
-            return resource.uriKey == resourceName
-        })
+function getResourceMeta(resourceName) {
+    let resourceMeta = Nova.config.resources.filter(function(resource) {
+        return resource.uriKey == resourceName
+    })
 
-        if (resourceMeta[0] != undefined)
-            resourceMeta = resourceMeta[0]
-        else
-            resourceMeta = null
+    if (resourceMeta[0] != undefined)
+        resourceMeta = resourceMeta[0]
+    else
+        resourceMeta = null
 
-        return resourceMeta
-    }
+    return resourceMeta
+}
 
-    Nova.booting((Vue, router, store) => {
-        var originalTitle = document.title;
-        router.beforeEach((to, from, next) => {
+Nova.booting((Vue, router, store) => {
+    let originalTitle = document.title;
+    router.afterEach((to, from, next) => {
 
-            var resourceMeta = getResourceMeta(to.params.resourceName);
-            var relatedResourceMeta = null;
+        let resourceMeta = getResourceMeta(to.params.resourceName);
+        let relatedResourceMeta = null;
 
-            if (to.params.relatedResourceName != undefined)
-                relatedResourceMeta = getResourceMeta(to.params.relatedResourceName)
+        if (typeof to.params.relatedResourceName !== 'undefined')
+            relatedResourceMeta = getResourceMeta(to.params.relatedResourceName)
 
-            console.debug(resourceMeta, to);
-            var label = to.params.resourceName;
+        let label = to.params.resourceName;
 
-            if (resourceMeta != null) {
-                if (to.name == "index")
-                    label = resourceMeta.label
-                else if (to.name == "detail")
-                    label = resourceMeta.singularLabel + " Detalhes"
-                else if (to.name == "edit-attached")
-                    label = "Edit " + resourceMeta.singularLabel + " -> " + relatedResourceMeta.singularLabel
-                else
-                    label = _.startCase(to.name) + " " + resourceMeta.singularLabel
-            } else {
-                label = parseRouteForDisplay(to.path)
+        let toName = to.name;
 
-                if (label == "")
-                    label = _.startCase(to.name)
+        if (toName.indexOf('custom-') === 0)
+            toName = toName.substr(7);
+
+        setTimeout(function() {
+            let h1 = document.getElementById('inner-content').querySelector('h1');
+            if (h1) {
+                document.title = h1.innerText + ' | ' + originalTitle;
             }
+        }, 1000);
 
-            document.title = label + " | " + originalTitle
+        if (resourceMeta) {
+            if (toName == 'index')
+                label = resourceMeta.label;
+            else if (toName == 'detail')
+                label = resourceMeta.singularLabel + ' #' + to.params.resourceId;
+            else if (toName == 'edit-attached')
+                label = 'Editar ' + resourceMeta.singularLabel + ' - > ' + relatedResourceMeta.singularLabel
+            else if (toName == 'edit')
+                label = 'Editar ' + resourceMeta.singularLabel + ' #' + to.params.resourceId;
+            else
+                label = _.startCase(to.name) + ' ' + resourceMeta.singularLabel;
+        } else {
+            label = parseRouteForDisplay(to.path)
 
-            next()
-        })
-    });
+            if (label == '')
+                label = _.startCase(to.name)
+        }
+
+        document.title = label + ' | ' + originalTitle;
+
+        if (typeof next === 'function')
+            next();
+    })
+});
