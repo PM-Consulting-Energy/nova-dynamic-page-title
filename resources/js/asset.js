@@ -36,7 +36,7 @@ Nova.booting((Vue, router, store) => {
 
         setTimeout(function() {
             let h1 = document.getElementById('inner-content').querySelector('h1');
-            if (h1) {
+            if (h1 && typeof h1.innerText !== 'undefined' && h1.innerText.trim().length) {
                 document.title = h1.innerText + ' | ' + originalTitle;
             }
         }, 1000);
