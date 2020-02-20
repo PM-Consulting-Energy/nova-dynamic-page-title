@@ -36,7 +36,7 @@ Nova.booting((Vue, router, store) => {
             if(to.name == "index")
                 label = resourceMeta.label
             else if(to.name == "detail")
-                label = resourceMeta.singularLabel + " Details"
+                label = resourceMeta.singularLabel + " Detalhes"
             else if(to.name == "edit-attached")
                 label = "Edit " + resourceMeta.singularLabel + " -> " + relatedResourceMeta.singularLabel
             else
