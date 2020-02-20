@@ -53,13 +53,13 @@ Nova.booting((Vue, router, store) => {
             else
                 label = _.startCase(to.name) + ' ' + resourceMeta.singularLabel;
         } else {
-            label = parseRouteForDisplay(to.path)
-
-            if (label == '')
-                label = _.startCase(to.name)
+            // label = parseRouteForDisplay(to.path)
+            //
+            // if (label == '')
+            //     label = _.startCase(to.name)
         }
 
-        document.title = label + ' | ' + originalTitle;
+        document.title = label ? label + ' | ' + originalTitle : originalTitle;
 
         if (typeof next === 'function')
             next();
