@@ -20,8 +20,8 @@ function getResourceMeta(resourceName) {
 let checkAndUpdateTitle_interval = null;
 let checkAndUpdateTitle_interval_count = 0;
 
-function checkAndUpdateTitle() {
-    let originalTitle = document.title;
+function checkAndUpdateTitle(originalTitle = null) {
+    originalTitle = typeof originalTitle !== 'undefined' && !!originalTitle ? originalTitle : document.title;
     let titleUpdated = false;
     checkAndUpdateTitle_interval_count++;
 
@@ -77,7 +77,7 @@ Nova.booting((Vue, router, store) => {
 
         if (!checkAndUpdateTitle_interval_count) {
             checkAndUpdateTitle_interval = setInterval(function() {
-                checkAndUpdateTitle();
+                checkAndUpdateTitle(originalTitle);
             }, 1000);
         }
 
