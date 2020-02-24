@@ -21,6 +21,7 @@ let checkAndUpdateTitle_interval = null;
 let checkAndUpdateTitle_interval_count = 0;
 
 function checkAndUpdateTitle() {
+    let originalTitle = document.title;
     let titleUpdated = false;
     checkAndUpdateTitle_interval_count++;
 
@@ -54,12 +55,6 @@ Nova.booting((Vue, router, store) => {
         if (toName.indexOf('custom-') === 0)
             toName = toName.substr(7);
 
-        if (!checkAndUpdateTitle_interval_count) {
-            checkAndUpdateTitle_interval = setInterval(function() {
-                checkAndUpdateTitle();
-            }, 1000);
-        }
-
         if (resourceMeta) {
             if (toName == 'index')
                 label = resourceMeta.label;
@@ -79,6 +74,12 @@ Nova.booting((Vue, router, store) => {
         }
 
         document.title = label ? label + ' | ' + originalTitle : originalTitle;
+
+        if (!checkAndUpdateTitle_interval_count) {
+            checkAndUpdateTitle_interval = setInterval(function() {
+                checkAndUpdateTitle();
+            }, 1000);
+        }
 
         if (typeof next === 'function')
             next();
