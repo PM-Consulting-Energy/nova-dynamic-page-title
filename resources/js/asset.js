@@ -17,6 +17,26 @@ function getResourceMeta(resourceName) {
     return resourceMeta
 }
 
+let checkAndUpdateTitle_interval = null;
+let checkAndUpdateTitle_interval_count = 0;
+
+function checkAndUpdateTitle() {
+    let titleUpdated = false;
+    checkAndUpdateTitle_interval_count++;
+
+    let h1 = document.getElementById('inner-content').querySelector('h1');
+    if (h1 && typeof h1.innerText !== 'undefined' && h1.innerText.trim().length) {
+        document.title = h1.innerText.replace('← / ', '').trim() + ' | ' + originalTitle;
+        titleUpdated = true;
+    }
+
+    if (titleUpdated || checkAndUpdateTitle_interval_count > 10) {
+        clearInterval(checkAndUpdateTitle_interval);
+        checkAndUpdateTitle_interval_count = 0;
+    }
+}
+
+
 Nova.booting((Vue, router, store) => {
     let originalTitle = document.title;
     router.afterEach((to, from, next) => {
@@ -34,12 +54,11 @@ Nova.booting((Vue, router, store) => {
         if (toName.indexOf('custom-') === 0)
             toName = toName.substr(7);
 
-        setTimeout(function() {
-            let h1 = document.getElementById('inner-content').querySelector('h1');
-            if (h1 && typeof h1.innerText !== 'undefined' && h1.innerText.trim().length) {
-                document.title = h1.innerText.replace('← / ', '').trim() + ' | ' + originalTitle;
-            }
-        }, 1000);
+        if (!checkAndUpdateTitle_interval_count) {
+            checkAndUpdateTitle_interval = setInterval(function() {
+                checkAndUpdateTitle();
+            }, 1000);
+        }
 
         if (resourceMeta) {
             if (toName == 'index')
